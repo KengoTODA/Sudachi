@@ -119,16 +119,15 @@ public class DictionaryBuilder {
         }
         logger.info(() -> String.format(" %,d words%n", entries.size()));
 
-        FileChannel outputChannel = output.getChannel();
-        writeGrammar(matrixInput, outputChannel);
-        writeLexicon(outputChannel);
-        outputChannel.close();
+        try (FileChannel outputChannel = output.getChannel()) {
+            writeGrammar(matrixInput, outputChannel);
+            writeLexicon(outputChannel);
+        }
     }
 
     void buildLexicon(String filename, BufferedReader lexiconReader) throws IOException {
         int lineno = -1;
-        try (LineNumberReader reader = new LineNumberReader(lexiconReader);
-                CSVParser parser = new CSVParser(reader)) {
+        try (LineNumberReader reader = new LineNumberReader(lexiconReader); CSVParser parser = new CSVParser(reader)) {
             for (List<String> columns = parser.getNextRecord(); columns != null; columns = parser.getNextRecord()) {
                 lineno = reader.getLineNumber();
                 WordEntry entry = parseLine(columns.toArray(new String[columns.size()]));
