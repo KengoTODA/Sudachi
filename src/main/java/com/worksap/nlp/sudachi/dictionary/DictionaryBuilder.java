@@ -16,7 +16,6 @@
 
 package com.worksap.nlp.sudachi.dictionary;
 
-import java.io.BufferedInputStream;
 import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -107,7 +106,7 @@ public class DictionaryBuilder {
         buffer = byteBuffer; // a kludge for Java 9
     }
 
-    void build(List<String> lexiconPaths, InputStream matrixInput, FileOutputStream output) throws IOException {
+    void build(List<String> lexiconPaths, FileInputStream matrixInput, FileOutputStream output) throws IOException {
         logger.info("reading the source file...");
         for (String path : lexiconPaths) {
             try (FileInputStream lexiconInput = new FileInputStream(path)) {
@@ -211,7 +210,7 @@ public class DictionaryBuilder {
         return posTable.getId(String.join(",", posStrings));
     }
 
-    void writeGrammar(InputStream matrixInput, FileChannel output) throws IOException {
+    void writeGrammar(FileInputStream matrixInput, FileChannel output) throws IOException {
         logger.info("writing the POS table...");
         convertPOSTable(posTable.getList());
         buffer.flip();
@@ -614,7 +613,7 @@ public class DictionaryBuilder {
             output.write(header.toByte());
 
             DictionaryBuilder builder = new DictionaryBuilder();
-            builder.build(lexiconPaths, new BufferedInputStream(matrixInput), output);
+            builder.build(lexiconPaths, matrixInput, output);
         }
     }
 }
