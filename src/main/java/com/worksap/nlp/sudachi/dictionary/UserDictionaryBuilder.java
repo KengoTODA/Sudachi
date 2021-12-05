@@ -16,13 +16,11 @@
 
 package com.worksap.nlp.sudachi.dictionary;
 
-import java.io.BufferedReader;
 import java.io.Console;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -46,8 +44,8 @@ public class UserDictionaryBuilder extends DictionaryBuilder {
     void build(List<String> lexiconPaths, FileOutputStream output) throws IOException {
         logger.info("reading the source file...");
         for (String path : lexiconPaths) {
-            try (BufferedReader lexiconReader = Files.newBufferedReader(Paths.get(path))) {
-                buildLexicon(path, lexiconReader);
+            try (FileInputStream lexiconInput = new FileInputStream(path)) {
+                buildLexicon(path, lexiconInput);
             }
         }
         logger.info(() -> String.format(" %,d words%n", entries.size()));
