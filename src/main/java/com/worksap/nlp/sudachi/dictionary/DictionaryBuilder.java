@@ -17,6 +17,7 @@
 package com.worksap.nlp.sudachi.dictionary;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +30,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -110,8 +113,8 @@ public class DictionaryBuilder {
     void build(List<String> lexiconPaths, InputStream matrixInput, FileOutputStream output) throws IOException {
         logger.info("reading the source file...");
         for (String path : lexiconPaths) {
-            try (FileInputStream lexiconInput = new FileInputStream(path)) {
-                buildLexicon(path, lexiconInput);
+            try (BufferedReader lexiconReader = Files.newBufferedReader(Paths.get(path))) {
+                buildLexicon(path, lexiconReader);
             }
         }
         logger.info(() -> String.format(" %,d words%n", entries.size()));
@@ -122,10 +125,9 @@ public class DictionaryBuilder {
         outputChannel.close();
     }
 
-    void buildLexicon(String filename, FileInputStream lexiconInput) throws IOException {
+    void buildLexicon(String filename, BufferedReader lexiconReader) throws IOException {
         int lineno = -1;
-        try (InputStreamReader isr = new InputStreamReader(lexiconInput);
-                LineNumberReader reader = new LineNumberReader(isr);
+        try (LineNumberReader reader = new LineNumberReader(lexiconReader);
                 CSVParser parser = new CSVParser(reader)) {
             for (List<String> columns = parser.getNextRecord(); columns != null; columns = parser.getNextRecord()) {
                 lineno = reader.getLineNumber();
